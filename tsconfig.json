@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "pretty": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "es2020",
+    "lib": ["es2020"],
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "outDir": "./dist",
+    "sourceMap": true,
+    "types": ["node"],
+    "typeRoots": ["node_modules/@types"],
+    "baseUrl": "./",
+    "paths": {
+      "@configs/*": ["backend/configs/*"],
+      "@services/*": ["backend/services/*"],
+      "@mocks/*": ["backend/mocks/*"],
+      "@types/*": ["backend/types/*"],
+      "@modules/*": ["backend/modules/*"],
+      "@utils/*": ["backend/utils/index"],
+      "@controllers/*": ["backend/controllers/*"]
+    }
+  },
+  "include": ["backend/**/*"],
+  "exclude": ["node_modules", "backend/**/*.tests.ts"]
+}
