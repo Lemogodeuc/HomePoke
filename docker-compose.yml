@@ -1,0 +1,76 @@
+version: "3.7"
+
+services:
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    hostname: redis
+    ports:
+      - 6379:6379
+    # volumes:
+    #   - ./backend/data/cache:/app/backend/data/cache
+    environment:
+      - REDIS_AOF_ENABLED=no
+    networks:
+      - cache
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+
+  db:
+    image: postgres:alpine
+    container_name: db
+    volumes:
+      - ./backend/data/database/initDatabase.sql:/docker-entrypoint-initdb.d/initDatabase.sql
+    environment:
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+    env_file: .env
+    networks:
+      - database
+    ports:
+      - "5433:5432"
+      
+  app:
+    image: node:14-alpine
+    container_name: app
+    volumes:
+      - ./backend:/app
+    ports:
+      - 4000:4000
+    depends_on:
+      - redis
+      - db
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - REDIS_URL=${REDIS_URL}
+      - PGHOST=${PGHOST}
+      - PGUSER=${PGUSER}
+      - PGDATABASE=${PGDATABASE}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGPORT=${PGPORT}
+    networks:
+      - cache
+      - database
+    command: sh -c 'cd /app && npm i && npm run dev'
+
+  frontend:
+    image: node:14-alpine
+    container_name: frontend
+    volumes:
+      - './frontend:/app'
+      # - '/app/node_modules'
+    ports:
+      - 3000:3000
+    stdin_open: true
+    depends_on:
+      - app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c 'cd /app && npm i && npm run start'
+
+networks:
+  cache:
+    driver: bridge
+  database:
+    driver: bridge
