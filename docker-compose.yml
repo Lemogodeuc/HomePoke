@@ -29,14 +29,14 @@ services:
       - database
     ports:
       - "5433:5432"
-
+      
   app:
     image: node:14-alpine
     container_name: app
     volumes:
-      - ./:/app
+      - ./backend:/app
     ports:
-      - 3000:3000
+      - 4000:4000
     depends_on:
       - redis
       - db
@@ -52,6 +52,21 @@ services:
     networks:
       - cache
       - database
+    command: sh -c 'cd /app && npm i && npm run dev'
+
+  frontend:
+    image: node:14-alpine
+    container_name: frontend
+    volumes:
+      - './frontend:/app'
+      # - '/app/node_modules'
+    ports:
+      - 3000:3000
+    stdin_open: true
+    depends_on:
+      - app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     command: sh -c 'cd /app && npm i && npm run start'
 
 networks:
