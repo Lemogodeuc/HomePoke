@@ -1,4 +1,4 @@
-import { Offer } from "../../types";
+import { Offer, ScrapRequest } from "../../types";
 import { PoolClient } from "pg";
 import { DataSource } from "./dataSource";
 
@@ -20,26 +20,58 @@ class ScraperDataSource extends DataSource {
   async insertOne(scraperRequest: Offer) {
     try {
       const values = Object.values(scraperRequest);
-
       const query = {
-        text: `INSERT INTO "scrap_request"("active",
-                                           "title",
+        text: `INSERT INTO "scrap_request"("title",
+                                           "active",
                                            "status",
-                                           "fetch_only_once",
                                            "poll_interval",
                                            "url",
                                            "method",
-                                           "last_error",
                                            "profile_id",
-                                           "provider_id",
-                                           "request_header_id"
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-                 RETURNING "id"`,
+                                           "provider_id")
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                 RETURNING "id", "active", "status"`,
         values: values,
       };
 
       const { rows } = await this.client.query(query);
       return rows[0];
+    } catch (error) {
+      this.logger.verbose(error);
+    }
+  }
+
+  async updateOne(scraperRequest: ScrapRequest) {
+    try {
+      const { id, title, frequency, url } = scraperRequest;
+      const query = {
+        text: `UPDATE "scrap_request"
+                  SET "title" = $2,
+                      "poll_interval" = $3,
+                      "url" = $4
+                WHERE "id" = $1
+            RETURNING true`,
+        values: [id, title, frequency, url],
+      };
+
+      const { rows } = await this.client.query(query);
+      return !!rows[0].bool;
+    } catch (error) {
+      this.logger.verbose(error);
+    }
+  }
+
+  async deleteOne(id: string | number) {
+    try {
+      const query = {
+        text: `DELETE FROM "scrap_request"
+                     WHERE "id" = $1
+                 RETURNING true`,
+        values: [id],
+      };
+
+      const { rows } = await this.client.query(query);
+      return !!rows[0].bool;
     } catch (error) {
       this.logger.verbose(error);
     }
@@ -53,13 +85,13 @@ class ScraperDataSource extends DataSource {
       this.logger.error(error);
     }
   }
-  
+
   async getAllByProfileId(profileId: number) {
     try {
-      const { rows } = await this.client.query('SELECT * FROM "scraping_view" WHERE "id" = $1', [profileId]);
+      const { rows } = await this.client.query('SELECT * FROM "scraping_view" WHERE "profileId" = $1', [profileId]);
       return rows;
     } catch (error) {
-      console.log("Error", error)
+      console.log("Error", error);
       this.logger.error(error);
     }
   }

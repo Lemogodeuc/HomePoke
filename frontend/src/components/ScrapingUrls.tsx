@@ -11,7 +11,8 @@ import {
   Paper,
   Icon,
 } from "@material-ui/core/";
-import Scrap from "../model/Scrap.model";
+import ScrapDialog from "./ScrapDialog";
+import { Scrap } from "../model/Scrap.model";
 import { DISPLAY_FEW_ITEMS } from "../utils/constants";
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -64,7 +65,13 @@ const getAction = (status: string, severity: number) => {
 };
 
 const getFrequency = (interval: number) => {
-  return interval / 1000 / 60 + " minutes";
+  const minutes = interval !== 0 ? interval / 1000 / 60 : null;
+  const hours = minutes && minutes > 60 ? minutes / 60 : null;
+  const days = hours && hours > 24 ? hours / 24 : null;
+
+  return (
+    (days && days + " jours") || (hours && hours + " heures") || (minutes && minutes + " minutes") || "1 seule fois"
+  );
 };
 
 const Scrapings: FC<Props> = ({ scrapings = [], reduce }): ReactElement => {
@@ -109,15 +116,15 @@ const Scrapings: FC<Props> = ({ scrapings = [], reduce }): ReactElement => {
                   {scrap.title}
                 </TableCell>
                 <TableCell align="center">{getStatus(scrap.status)}</TableCell>
-                <TableCell align="center">{getAction(scrap.status, scrap.severity)}</TableCell>
-                <TableCell align="center">{scrap.provider}</TableCell>
+                <TableCell align="center">{getAction(scrap.status, scrap.severity || 0)}</TableCell>
+                <TableCell align="center">{scrap.provider && scrap.provider.name}</TableCell>
                 <TableCell align="center">{getFrequency(scrap.pollInterval)}</TableCell>
-                <TableCell align="center">{scrap.error ? scrap.error : "Aucune"}</TableCell>
+                <TableCell align="center">{scrap.lastError ? scrap.lastError : "Aucune"}</TableCell>
                 <TableCell align="center">
-                  <Icon style={{ color: "gray" }}>edit</Icon>
+                  <ScrapDialog mode="edit" values={scrap} />
                 </TableCell>
                 <TableCell align="center">
-                  <Icon style={{ color: "gray" }}>delete</Icon>
+                  <ScrapDialog mode="delete" values={scrap} />
                 </TableCell>
               </TableRow>
             ))}

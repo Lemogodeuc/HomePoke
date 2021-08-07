@@ -52,11 +52,10 @@ CREATE TABLE IF NOT EXISTS "scrap_request" (
     "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "title" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT false,
-    "status" TEXT NOT NULL DEFAULT 'running',
-    "fetch_only_once" BOOLEAN NOT NULL DEFAULT true,
-    "poll_interval" INT NOT NULL DEFAULT 600000, -- 10 minutes in ms
+    "status" TEXT NOT NULL DEFAULT 'inactive',
+    "poll_interval" INT NULL DEFAULT 900000, -- 15 minutes in ms
     "url" TEXT NOT NULL,
-    "method" TEXT NOT NULL default 'GET',
+    "method" TEXT NOT NULL DEFAULT 'GET',
     "last_error" TEXT NULL,
     "profile_id" INT NOT NULL REFERENCES "profile"("id") ON DELETE CASCADE,
     "provider_id" INT NOT NULL REFERENCES "provider"("id") ON DELETE CASCADE,
@@ -93,36 +92,59 @@ CREATE TABLE IF NOT EXISTS "offer" (
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TYPE "profile_type" AS ("id" INT, "label" TEXT, "createdAt" TIMESTAMPTZ);
+
 CREATE VIEW "scraping_view" AS
      SELECT "sr"."id",
             "sr"."title",
             "sr"."active",
             "sr"."status",
-            "sr"."fetch_only_once" as "fetchOnlyOnce",
             "sr"."poll_interval" as "pollInterval",
             "sr"."url",
             "sr"."method",
+            "sr"."profile_id" as "profileId",
             "sr"."last_error" as "lastError",
-            json_build_object(
-           		'id', "provider"."id", 
-           		'name', "provider"."name",
-           		'host', "provider"."host") AS "provider",
-            json_build_object(
-                'id', "profile"."id", 
-                'name', "profile"."name") AS "profile",
-            json_build_object(
-                'id', "u"."id", 
-                'firstname', "u"."firstname", 
-                'lastname', "u"."lastname", 
-                'email', "u"."email") AS "user",
             "sr"."request_header_id" AS "requestHeaderId",
             "sr"."created_at" as "createdAt",
-            "sr"."updated_at" as "updatedAt"
+            "sr"."updated_at" as "updatedAt",
+            to_json("provider".*) AS "provider",
+            to_json("profile".*) AS "profile",
+            to_json("u".*) AS "user"
       FROM "scrap_request" "sr"
-      JOIN "provider" ON "provider"."id" = "sr"."provider_id"
-      JOIN "profile"  ON "profile"."id" = "sr"."profile_id"
+      JOIN "profile" ON "profile"."id" = "sr"."profile_id"
       JOIN "user" "u" ON "u"."id" = "profile"."user_id"
+      JOIN "provider" ON "provider"."id" = "sr"."provider_id"
   ORDER BY "sr"."id" ASC;
+
+-- CREATE VIEW "scraping_view" AS
+--      SELECT "sr"."id",
+--             "sr"."title",
+--             "sr"."active",
+--             "sr"."status",
+--             "sr"."poll_interval" as "pollInterval",
+--             "sr"."url",
+--             "sr"."method",
+--             "sr"."last_error" as "lastError",
+--             json_build_object(
+--            		'id', "provider"."id", 
+--            		'name', "provider"."name",
+--            		'host', "provider"."host") AS "provider",
+--             json_build_object(
+--                 'id', "profile"."id", 
+--                 'name', "profile"."name") AS "profile",
+--             json_build_object(
+--                 'id', "u"."id", 
+--                 'firstname', "u"."firstname", 
+--                 'lastname', "u"."lastname", 
+--                 'email', "u"."email") AS "user",
+--             "sr"."request_header_id" AS "requestHeaderId",
+--             "sr"."created_at" as "createdAt",
+--             "sr"."updated_at" as "updatedAt"
+--       FROM "scrap_request" "sr"
+--       JOIN "provider" ON "provider"."id" = "sr"."provider_id"
+--       JOIN "profile"  ON "profile"."id" = "sr"."profile_id"
+--       JOIN "user" "u" ON "u"."id" = "profile"."user_id"
+--   ORDER BY "sr"."id" ASC;
 
 -------------------------------------------------------------------------
 --------------------------------- Seeds ---------------------------------

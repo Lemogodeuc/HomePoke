@@ -3,8 +3,8 @@ import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
-import { Offer } from "../model/Offer.model"
-import Scrap from "../model/Scrap.model"
+import { Offer } from "../model/Offer.model";
+import { Scrap } from "../model/Scrap.model";
 
 // components
 import PageTitle from "../components/PageTitle";
@@ -32,23 +32,23 @@ const Home: FC<{}> = (): ReactElement => {
   const [scrapers, setScrapers] = useState<null | Scrap[]>(null);
 
   const getAllOffers = async () => {
-   try {
-    const { data: offersData } = await axios.get(BASE_URL + "/offers/profile/1");
-    setOffers(offersData);
-   } catch (error) {  
-    console.log("[getAllOffers] ", error);
-   } 
-  }
-  
+    try {
+      const { data: offersData } = await axios.get(BASE_URL + "/offers/profile/1");
+      setOffers(offersData);
+    } catch (error) {
+      console.log("[getAllOffers] ", error);
+    }
+  };
+
   const getAllScrapers = async () => {
-   try {
-    const { data: scrapersData } = await axios.get(BASE_URL + "/scrapers/profile/1");
-    // console.log('[scrapersData] ', scrapersData);
-    setScrapers(scrapersData);
-   } catch (error) {  
-    console.log("[getAllScrapers] ", error);
-   } 
-  }
+    try {
+      const { data: scrapersData } = await axios.get(BASE_URL + "/scrapers/profile/1");
+      // console.log('[scrapersData] ', scrapersData);
+      setScrapers(scrapersData);
+    } catch (error) {
+      console.log("[getAllScrapers] ", error);
+    }
+  };
 
   useEffect(() => {
     !offers && getAllOffers();
