@@ -1,8 +1,13 @@
 import { FC, ReactElement, useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+
+// API
+import API from "../data";
+
+// Types
+import { Offer } from "../model/Offer.model";
+import { Scrap } from "../model/Scrap.model";
 
 // components
 import PageTitle from "../components/PageTitle";
@@ -24,49 +29,34 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const scrapMock = [
-  {
-    title: "Appart BAB - T2 - 700€",
-    status: "active",
-    provider: "Leboncoin",
-    error: null,
-    severity: 0,
-    pollInterval: 900000,
-  },
-  {
-    title: "Appart bidart",
-    status: "warning",
-    provider: "Orpi",
-    error: "Parsing issues",
-    severity: 1,
-    pollInterval: 1800000,
-  },
-  {
-    title: "Appart ustaritz",
-    status: "inactive",
-    provider: "Seloger",
-    error: 403,
-    severity: 3,
-    pollInterval: 3600000,
-  },
-];
-
 const Dashboard: FC<{}> = (): ReactElement => {
   const classes = useStyles();
-  const [offers, setOffers] = useState([{}]);
+  const [offers, setOffers] = useState<null | Offer[]>(null);
+  const [scrapers, setScrapers] = useState<null | Scrap[]>(null);
+
+  const getAllOffers = async () => {
+    try {
+      const data = await API.offer.getAllByUserId(1);
+      setOffers(data);
+      console.log("[offers] ", data);
+    } catch (error) {
+      console.log("[getAllOffers] ", error);
+    }
+  };
+
+  const getAllScrapers = async () => {
+    try {
+      const data = await API.scraper.getAllByUserId(1);
+      setScrapers(data);
+    } catch (error) {
+      console.log("[getAllScrapers] ", error);
+    }
+  };
 
   useEffect(() => {
-    const getAllOffers = async () => {
-      try {
-        const { data } = await axios.get(BASE_URL + "/offers/profile/1");
-        setOffers(data);
-      } catch (error) {
-        console.log("[error] ", error);
-      }
-    };
-
-    offers.length && !Object.keys(offers[0]).length && getAllOffers();
-  }, [offers]);
+    !offers && getAllOffers();
+    !scrapers && getAllScrapers();
+  }, [offers, scrapers]);
 
   return (
     <>
@@ -78,8 +68,8 @@ const Dashboard: FC<{}> = (): ReactElement => {
       <div className={classes.root}>
         <PageTitle title={PAGE_TITLE_DASHBOARD} />
         <br></br>
-        <Scrapers scrapings={scrapMock} reduce />
-        <Offers offers={offers} reduce />
+        <Scrapers scrapings={scrapers ? scrapers : []} reduce />
+        <Offers offers={offers ? offers : []} reduce />
       </div>
     </>
   );

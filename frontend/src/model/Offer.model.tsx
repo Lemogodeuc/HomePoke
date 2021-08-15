@@ -1,8 +1,9 @@
 export interface Offer {
-  id: number | string;
+  id: number;
   active: boolean;
   title: string;
-  descripion: string;
+  excerpt: string;
+  description: string;
   ownerName: string;
   ownerType: string;
   url: string;
@@ -19,7 +20,9 @@ export interface Offer {
   energy: string | null;
   ges: string | null;
   publicationDate: string | null;
-  contacted: boolean;
-  profileId: string | null;
+  isFavorite: boolean;
+  isContacted: boolean;
+  isDelete: boolean;
+  userId: number | null;
   assets: string | null;
 }

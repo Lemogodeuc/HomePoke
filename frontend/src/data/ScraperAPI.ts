@@ -16,17 +16,17 @@ class ScraperAPI extends API {
     }
   }
 
-  async getAllByProfileId(profileId: number) {
+  async getAllByUserId(userId: number) {
     try {
-      return await this.request("get", `${this.endpoint}/profile/${profileId}`);
+      return await this.request("get", `${this.endpoint}/user/${userId}`);
     } catch (error) {
-      console.log("[getAllByProfileId] ", error);
+      console.log("[getAllByUserId] ", error);
     }
   }
 
-  async createOne(profileId: number, data: any) {
+  async createOne(userId: number, data: any) {
     try {
-      return await this.request("post", `${this.endpoint}/profile/${profileId}`, data);
+      return await this.request("post", `${this.endpoint}/user/${userId}`, data);
     } catch (error) {
       console.log("[createOne] ", error);
     }

@@ -24,7 +24,7 @@ class UserDataSource extends DataSource {
 
   async getOneById(id: number) {
     try {
-      const { rows } = await this.client.query('SELECT * FROM "user" WHERE "id" = $1', [id]);
+      const { rows } = await this.client.query('SELECT * FROM "user_view" WHERE "id" = $1', [id]);
       return rows[0];
     } catch (error) {
       this.logger.error(error);

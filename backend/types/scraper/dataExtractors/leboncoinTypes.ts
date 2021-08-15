@@ -92,7 +92,8 @@ export interface Offer {
   listId?: number;
   active: boolean;
   title: string;
-  descripion: string;
+  excerpt?: string;
+  description: string;
   ownerName: string;
   ownerType: string;
   url: string;

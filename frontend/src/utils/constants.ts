@@ -2,7 +2,8 @@
 export const APP_TITLE = "HomePoke";
 export const FOOTER_TEXT = `${new Date().getFullYear()} Built with ♡ by HomePoke `;
 // PAGES TITLE
-export const PAGE_TITLE_HOME = "Accueil";
+export const MENU_TITLE_HOME = "Accueil";
+export const PAGE_TITLE_HOME = "Les derniers appartements";
 export const PAGE_TITLE_DASHBOARD = "Tableau de bord";
 export const PAGE_TITLE_SCRAPER = "Scrapers";
 export const PAGE_TITLE_OFFERS = "Offres";

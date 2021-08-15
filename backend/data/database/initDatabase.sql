@@ -1,20 +1,16 @@
 BEGIN;
 
--- Create tables
+-------------------------------------------------------------------------
+-------------------------------- TABLES ---------------------------------
+-------------------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS "user" (
     "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    "username" TEXT UNIQUE NOT NULL,
     "firstname" TEXT NULL,
     "lastname" TEXT NULL,
     "email" TEXT UNIQUE NOT NULL,
     "password" TEXT NOT NULL,
-    "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS "profile" (
-    "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "name" TEXT NOT NULL,
-    "user_id" INT NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -43,12 +39,11 @@ CREATE TABLE IF NOT EXISTS "request_header" (
     "upgrade_insecure_requests" TEXT NOT NULL,
     "accept_encoding" TEXT NOT NULL,
     "accept_language" TEXT NOT NULL,
-    "profile_id" INT NOT NULL REFERENCES "profile"("id") ON DELETE CASCADE,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS "scrap_request" (
+CREATE TABLE IF NOT EXISTS "request" (
     "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "title" TEXT NOT NULL,
     "active" BOOLEAN NOT NULL DEFAULT false,
@@ -57,7 +52,7 @@ CREATE TABLE IF NOT EXISTS "scrap_request" (
     "url" TEXT NOT NULL,
     "method" TEXT NOT NULL DEFAULT 'GET',
     "last_error" TEXT NULL,
-    "profile_id" INT NOT NULL REFERENCES "profile"("id") ON DELETE CASCADE,
+    "user_id" INT NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
     "provider_id" INT NOT NULL REFERENCES "provider"("id") ON DELETE CASCADE,
     "request_header_id" INT NULL REFERENCES "request_header"("id") ON DELETE CASCADE,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -68,7 +63,7 @@ CREATE TABLE IF NOT EXISTS "offer" (
     "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     "active" BOOLEAN DEFAULT false,
     "title" TEXT NOT NULL,
-    "descripion" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
     "owner_name" TEXT NOT NULL,
     "owner_type" TEXT NOT NULL,
     "url" TEXT NOT NULL,
@@ -85,85 +80,104 @@ CREATE TABLE IF NOT EXISTS "offer" (
     "energy" TEXT NULL,
     "ges" TEXT NULL,
     "assets" TEXT NULL,
-    "contacted" BOOLEAN DEFAULT false,
+    "is_contacted" BOOLEAN DEFAULT false,
+    "is_favorite" BOOLEAN DEFAULT false,
+    "is_delete" BOOLEAN DEFAULT false,
     "publication_date" TIMESTAMP WITH TIME ZONE,
-    "profile_id" INT NOT NULL REFERENCES "profile"("id") ON DELETE CASCADE,
+    "user_id" INT NOT NULL REFERENCES "user"("id") ON DELETE CASCADE,
     "created_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TYPE "profile_type" AS ("id" INT, "label" TEXT, "createdAt" TIMESTAMPTZ);
+-------------------------------------------------------------------------
+--------------------------------- TYPES ---------------------------------
+-------------------------------------------------------------------------
+CREATE TYPE "user_type" AS ("id" INT, "username" TEXT, "firstname" TEXT, "lastname" TEXT, "created_at" TIMESTAMPTZ, "updated_at" TIMESTAMPTZ);
 
-CREATE VIEW "scraping_view" AS
-     SELECT "sr"."id",
-            "sr"."title",
-            "sr"."active",
-            "sr"."status",
-            "sr"."poll_interval" as "pollInterval",
-            "sr"."url",
-            "sr"."method",
-            "sr"."profile_id" as "profileId",
-            "sr"."last_error" as "lastError",
-            "sr"."request_header_id" AS "requestHeaderId",
-            "sr"."created_at" as "createdAt",
-            "sr"."updated_at" as "updatedAt",
-            to_json("provider".*) AS "provider",
-            to_json("profile".*) AS "profile",
-            to_json("u".*) AS "user"
-      FROM "scrap_request" "sr"
-      JOIN "profile" ON "profile"."id" = "sr"."profile_id"
-      JOIN "user" "u" ON "u"."id" = "profile"."user_id"
-      JOIN "provider" ON "provider"."id" = "sr"."provider_id"
-  ORDER BY "sr"."id" ASC;
+-------------------------------------------------------------------------
+--------------------------------- VIEWS ---------------------------------
+-------------------------------------------------------------------------
 
--- CREATE VIEW "scraping_view" AS
---      SELECT "sr"."id",
---             "sr"."title",
---             "sr"."active",
---             "sr"."status",
---             "sr"."poll_interval" as "pollInterval",
---             "sr"."url",
---             "sr"."method",
---             "sr"."last_error" as "lastError",
---             json_build_object(
---            		'id', "provider"."id", 
---            		'name', "provider"."name",
---            		'host', "provider"."host") AS "provider",
---             json_build_object(
---                 'id', "profile"."id", 
---                 'name', "profile"."name") AS "profile",
---             json_build_object(
---                 'id', "u"."id", 
---                 'firstname', "u"."firstname", 
---                 'lastname', "u"."lastname", 
---                 'email', "u"."email") AS "user",
---             "sr"."request_header_id" AS "requestHeaderId",
---             "sr"."created_at" as "createdAt",
---             "sr"."updated_at" as "updatedAt"
---       FROM "scrap_request" "sr"
---       JOIN "provider" ON "provider"."id" = "sr"."provider_id"
---       JOIN "profile"  ON "profile"."id" = "sr"."profile_id"
---       JOIN "user" "u" ON "u"."id" = "profile"."user_id"
---   ORDER BY "sr"."id" ASC;
+CREATE VIEW "user_view" AS
+     SELECT "u"."id",
+            "u"."username",
+            "u"."firstname",
+            "u"."lastname",
+            "u"."email",
+            "u"."created_at" AS "createdAt",
+            "u"."updated_at" AS "updatedAt"
+       FROM "user" "u";
+
+CREATE VIEW "request_view" AS
+     SELECT "r"."id",
+            "r"."title",
+            "r"."active",
+            "r"."status",
+            "r"."poll_interval" AS "pollInterval",
+            "r"."url",
+            "r"."method",
+            "r"."last_error" AS "lastError",
+            "r"."user_id" AS "userId",
+            "r"."provider_id" AS "providerId",
+            "r"."request_header_id" AS "requestHeaderId",
+            "r"."created_at" AS "createdAt",
+            "r"."updated_at" AS "updatedAt"
+       FROM "request" "r";
+
+CREATE VIEW "provider_view" AS
+     SELECT "p"."id",
+            "p"."name",
+            "p"."host",
+            "p"."created_at" AS "createdAt",
+            "p"."updated_at" AS "updatedAt"
+       FROM "provider" "p";
+
+CREATE VIEW "offer_view" AS
+     SELECT "o"."id",
+            "o"."active",
+            "o"."title",
+            "o"."description",
+            "o"."owner_name" AS "ownerName",
+            "o"."owner_type" AS "ownerType",
+            "o"."url",
+            "o"."city",
+            "o"."city_code" AS "cityCode",
+            "o"."location",
+            "o"."image_urls" AS "imageUrls",
+            "o"."price",
+            "o"."including_charges" AS "includingCharges",
+            "o"."type",
+            "o"."furnished",
+            "o"."surface",
+            "o"."rooms",
+            "o"."energy",
+            "o"."ges",
+            "o"."assets",
+            "o"."is_contacted" AS "isContacted",
+            "o"."is_favorite" AS "isFavorite",
+            "o"."is_delete" AS "isDelete",
+            "o"."publication_date" AS "publicationDate",
+            "o"."user_id" AS "userId",
+            "o"."created_at" AS "createdAt",
+            "o"."updated_at" AS "updatedAt"
+       FROM "offer" "o"
+      WHERE "o"."is_delete" = 'false';
 
 -------------------------------------------------------------------------
 --------------------------------- Seeds ---------------------------------
 -------------------------------------------------------------------------
 
 -- Users (plain text password: pokePass)
-INSERT INTO "user"("firstname", "lastname", "email", "password") VALUES
-('Quentin', 'Lemogodeuc', 'q.lemogodeuc@gmail.com', '$2y$10$qqU18ORqDHh6ivWjXv07ee2KiFpcsIFLxITRmvZqPL9n7ScjnBIeu');
-
--- Profiles
-INSERT INTO "profile"("name", "user_id") VALUES
-('Pepito', 1);
+INSERT INTO "user"("username","firstname", "lastname", "email", "password") VALUES
+('Pepito', 'Quentin', 'Lemogodeuc', 'q.lemogodeuc@gmail.com', '$2y$10$qqU18ORqDHh6ivWjXv07ee2KiFpcsIFLxITRmvZqPL9n7ScjnBIeu');
 
 -- Providers
 INSERT INTO "provider"("name", "host") VALUES
 ('Leboncoin', 'leboncoin');
 
 -- Scrap Requests
-INSERT INTO "scrap_request"("title", "url", "profile_id", "provider_id") VALUES
-('Appart BAB', 'https://www.leboncoin.fr/recherche?category=10&text=appartement&locations=Bayonne_64100__43.49273_-1.4787_5005%2CAnglet_64600__43.48188_-1.5147_5380%2CBidart_64210__43.4391_-1.591_3996%2CBiarritz_64200__43.48285_-1.55883_4205&real_estate_type=2&price=500-750&rooms=2-2&square=40-max', 1, 1);
+INSERT INTO "request"("title", "url", "user_id", "provider_id") VALUES
+('Appart BAB', 'https://www.leboncoin.fr/recherche?category=10&text=appartement&locations=Bayonne_64100__43.49273_-1.4787_5005%2CAnglet_64600__43.48188_-1.5147_5380%2CBidart_64210__43.4391_-1.591_3996%2CBiarritz_64200__43.48285_-1.55883_4205&real_estate_type=2&price=500-750&rooms=2-2&square=40-max', 1, 1),
+('Appart ANGLET', 'https://www.leboncoin.fr/recherche?category=10&text=appartement&locations=Bayonne_64100__43.49273_-1.4787_5005%2CAnglet_64600__43.48188_-1.5147_5380%2CBidart_64210__43.4391_-1.591_3996%2CBiarritz_64200__43.48285_-1.55883_4205&real_estate_type=2&price=500-750&rooms=2-2&square=40-max', 1, 1);
 
 COMMIT;
