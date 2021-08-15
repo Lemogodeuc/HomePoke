@@ -36,7 +36,7 @@ const Scraper: FC<{}> = (): ReactElement => {
     !scrapers.length &&
       (async () => {
         try {
-          setScrapers(await API.scraper.getAllByProfileId(1));
+          setScrapers(await API.scraper.getAllByUserId(1));
         } catch (error) {
           console.log("[getScraps] ", error);
         }

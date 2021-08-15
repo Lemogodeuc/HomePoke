@@ -77,9 +77,9 @@ const scraperController = {
     }
   },
 
-  async getAllByProfileId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getAllByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const scrapers = await req.context.dataSources.scrapers.getAllByProfileId(req.params.profileId);
+      const scrapers = await req.context.dataSources.scrapers.getAllByUserId(req.params.userId);
       if (!scrapers) {
         throw req.context.error.http(404);
       }

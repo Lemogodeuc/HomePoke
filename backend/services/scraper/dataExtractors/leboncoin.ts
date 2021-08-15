@@ -42,7 +42,7 @@ const leboncoin = {
         listId: offer.list_id,
         active: offer.status === "active",
         title: offer.subject,
-        descripion: JSON.stringify(offer.body),
+        description: JSON.stringify(offer.body),
         ownerName: offer.owner.name,
         ownerType: offer.owner.type,
         url: offer.url,

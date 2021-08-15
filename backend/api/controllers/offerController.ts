@@ -1,38 +1,52 @@
-import { mapKeys, camelCase } from "lodash";
 import { Request, Response, NextFunction } from "express";
+import { Offer } from "../../types";
 
 const offerController = {
   async getOne(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const offer = await req.context.dataSources.offers.getOneById(req.params.offerId);
-  
+
       if (!offer) {
         return next({ httpStatus: 404 });
       }
-  
-      const result = mapKeys(offer, (_, key) => camelCase(key));
-      result.imageUrls = result.imageUrls.split(";");
-      res.json(result);
+
+      offer.imageUrls = offer.imageUrls.split(";");
+      offer.excerpt = offer.description.split(/\\n/)[0];
+      offer.description = offer.description.split(/\\n/).join("");
+
+      res.json(offer);
     } catch (error) {
       next(error);
     }
   },
 
-  async getAllByProfileId(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async getAllByUserId(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const offers = await req.context.dataSources.offers.getAllByProfileId(req.params.profileId);
-  
-      if (!offers || !offers.length) {
+      const offers = await req.context.dataSources.offers.getAllByUserId(req.params.userId);
+
+      if (!offers) {
         res.status(404).json({ code: 404, data: "Ressource not found" });
+        return;
       }
-  
-      const results = offers.map((offer: any) => {
-        const result = mapKeys(offer, (_, key) => camelCase(key));
-        result.imageUrls = result.imageUrls.split(";");
-        return result;
+      offers.forEach((offer: Offer) => {
+        offer.imageUrls = typeof offer.imageUrls === "string" ? offer.imageUrls.split(";") : offer.imageUrls;
+        offer.excerpt = offer.description.split(/\\n/)[0];
+        offer.description = offer.description.split(/\\n/).join("");
       });
-  
-      res.json(results);
+
+      res.json(offers);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async updateOne(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { offerId, action } = req.params;
+      const { value } = req.body;
+      const result = await req.context.dataSources.offers.updateOneById(offerId, action, value);
+      console.log("[result] ", result);
+      res.json(result);
     } catch (error) {
       next(error);
     }

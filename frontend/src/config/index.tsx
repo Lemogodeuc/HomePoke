@@ -17,13 +17,14 @@ import Github from "../pages/Github";
 // interface
 import RouteItem from "../model/RouteItem.model";
 
+// constants
 import * as constants from "../utils/constants";
 
 // define app routes
 export const routes: Array<RouteItem> = [
   {
     key: "router-home",
-    title: constants.PAGE_TITLE_HOME,
+    title: constants.MENU_TITLE_HOME,
     tooltip: "Home",
     path: "/",
     enabled: true,

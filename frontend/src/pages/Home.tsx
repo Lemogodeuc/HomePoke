@@ -1,15 +1,16 @@
 import { FC, ReactElement, useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import Card from "../components/Card";
 import { Offer } from "../model/Offer.model";
 import { Scrap } from "../model/Scrap.model";
 
+// API
+import API from "../data";
+
 // components
 import PageTitle from "../components/PageTitle";
-import Offers from "../components/Offers";
-// import Scrapers from "../components/ScrapingUrls";
+import Scrapers from "../components/ScrapingUrls";
 
 // constants
 import { APP_TITLE, PAGE_TITLE_HOME } from "../utils/constants";
@@ -23,6 +24,12 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: "column",
       justifyContent: "space-between",
     },
+    content: {
+      display: "flex",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+    },
   })
 );
 
@@ -33,8 +40,9 @@ const Home: FC<{}> = (): ReactElement => {
 
   const getAllOffers = async () => {
     try {
-      const { data: offersData } = await axios.get(BASE_URL + "/offers/profile/1");
-      setOffers(offersData);
+      const data = await API.offer.getAllByUserId(1);
+      setOffers(data);
+      console.log("[offers] ", data);
     } catch (error) {
       console.log("[getAllOffers] ", error);
     }
@@ -42,9 +50,8 @@ const Home: FC<{}> = (): ReactElement => {
 
   const getAllScrapers = async () => {
     try {
-      const { data: scrapersData } = await axios.get(BASE_URL + "/scrapers/profile/1");
-      // console.log('[scrapersData] ', scrapersData);
-      setScrapers(scrapersData);
+      const data = await API.scraper.getAllByUserId(1);
+      setScrapers(data);
     } catch (error) {
       console.log("[getAllScrapers] ", error);
     }
@@ -66,8 +73,10 @@ const Home: FC<{}> = (): ReactElement => {
       <div className={classes.root}>
         <PageTitle title={PAGE_TITLE_HOME} />
         <br></br>
-        {/* <Scrapers scrapings={scrapers || []} reduce /> */}
-        <Offers offers={offers || []} reduce />
+        <div className={classes.content}>
+          {offers?.map((offer: Offer, index: number) => index <= 5 && <Card content={offer} />)}
+          <Scrapers scrapings={scrapers || []} reduce />
+        </div>
       </div>
     </>
   );
