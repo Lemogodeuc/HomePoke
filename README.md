@@ -10,3 +10,11 @@ Once done, move to the root folder of the project and please run:
 ```bash
 docker compose up
 ```
+
+## Frontend
+
+You can access frontend at http://localhost:3000/
+
+## Backend
+
+You can access frontend at http://localhost:4000/

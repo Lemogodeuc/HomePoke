@@ -15,3 +15,8 @@ export const FOOTER_HEIGHT = 30;
 export const HEADER_HEIGHT = 60;
 export const DRAWER_WIDTH = 250;
 export const BASE_URL = "http://localhost:4000";
+// TIMES
+export const SECOND = 1000;
+export const MINUTE = SECOND * 60;
+export const HOUR = MINUTE * 60;
+export const DAY = HOUR * 24;

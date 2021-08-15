@@ -1,9 +1,10 @@
-import { FC, ReactElement } from "react";
+import { useState, useEffect, FC, ReactElement } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import { Paper, IconButton } from "@material-ui/core/";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import { Paper } from "@material-ui/core/";
 import ScrapinUrls from "../components/ScrapingUrls";
+import ScrapDialog from "../components/ScrapDialog";
+import API from "../data";
 
 // components
 import PageTitle from "../components/PageTitle";
@@ -29,32 +30,18 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Scraper: FC<{}> = (): ReactElement => {
   const classes = useStyles();
-  const mock = [
-    {
-      title: "Appart BAB - T2 - 700€",
-      status: "active",
-      provider: "Leboncoin",
-      error: null,
-      severity: 0,
-      interval: 900000,
-    },
-    {
-      title: "Appart bidart",
-      status: "warning",
-      provider: "Orpi",
-      error: "Parsing issues",
-      severity: 1,
-      interval: 1800000,
-    },
-    {
-      title: "Appart ustaritz",
-      status: "inactive",
-      provider: "Seloger",
-      error: 403,
-      severity: 3,
-      interval: 3600000,
-    },
-  ];
+  const [scrapers, setScrapers] = useState([]);
+
+  useEffect(() => {
+    !scrapers.length &&
+      (async () => {
+        try {
+          setScrapers(await API.scraper.getAllByProfileId(1));
+        } catch (error) {
+          console.log("[getScraps] ", error);
+        }
+      })();
+  }, [scrapers]);
 
   return (
     <>
@@ -66,11 +53,9 @@ const Scraper: FC<{}> = (): ReactElement => {
       <div className={classes.root}>
         <PageTitle title={PAGE_TITLE_SCRAPER} />
         <Paper className={classes.addScrap} square>
-        <IconButton color="primary" component="span">
-          <AddCircleIcon  />
-        </IconButton>
+          <ScrapDialog mode="create" />
         </Paper>
-        <ScrapinUrls scrapings={mock} />
+        <ScrapinUrls scrapings={scrapers} />
       </div>
     </>
   );
