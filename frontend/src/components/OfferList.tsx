@@ -1,16 +1,22 @@
 import { ReactElement, FC } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
+
+// components
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Icon } from "@material-ui/core/";
-import { Offer } from "../model/Offer.model";
-import { DISPLAY_FEW_ITEMS } from "../utils/constants";
 import CardDialog from "./OfferDialog";
 
-// Icons
+// constants
+import { DISPLAY_FEW_ITEMS } from "../utils/constants";
+
+// icons
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 
-// APÏ
-import API from "../data";
+// types
+import { Offer } from "../model/Offer.model";
+
+// hook
+import useOffers from "../hooks/useOffers";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -31,13 +37,9 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  offers: Array<Offer>;
+  offers: Offer[];
   reduce?: boolean;
 }
-
-const handleUpdate = async (offerId: number, action: string, value: boolean) => {
-  API.offer.updateOne(offerId, action, value);
-};
 
 const getTimestamp = (date: string): number => new Date(date).getTime();
 
@@ -45,8 +47,10 @@ const sortByDate = (a: any, b: any): number => {
   return getTimestamp(a.createdAt) - getTimestamp(b.createdAt);
 };
 
-const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
+const OfferList: FC<Props> = ({ offers, reduce = false }): ReactElement => {
+  const { updateOffer } = useOffers();
   const classes = useStyles();
+  const titles = ["Voir", "Favoris", "Actif", "Loyer", "Superficie", "Pièces", "Ville", "Contacté", "Supprimer"];
 
   return (
     <TableContainer component={Paper} className={classes.root}>
@@ -54,39 +58,17 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
         <TableHead style={{ fontWeight: "bold", color: "red" }}>
           <TableRow hover>
             <TableCell className={classes.header}>{reduce ? "Les dernières offres" : "Les offres du moment"}</TableCell>
-            <TableCell className={classes.header} align="center">
-              Voir
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Favoris
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Actif
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Loyer
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Superficie&nbsp;(m2)
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Pièces
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Ville
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Contacté
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Supprimer
-            </TableCell>
+            {titles.map((title) => (
+              <TableCell className={classes.header} align="center">
+                {title}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {offers
             .sort(sortByDate)
-            .filter((_, index) => (reduce ? index <= DISPLAY_FEW_ITEMS : true))
+            .filter((offer: Offer, index: number) => (reduce ? index <= DISPLAY_FEW_ITEMS : true) && !offer.isDelete)
             .map((offer: Offer, index: number) => (
               <TableRow key={offer.title + index}>
                 <TableCell component="th" scope="row" style={{ fontWeight: "bold" }}>
@@ -99,19 +81,19 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
                   {offer.isFavorite ? (
                     <FavoriteIcon
                       className={classes.iconButton}
-                      onClick={() => handleUpdate(offer.id, "favorite", !offer.isFavorite)}
+                      onClick={() => updateOffer(offer.id, "favorite", !offer.isFavorite)}
                       style={{ color: "red" }}
                     />
                   ) : (
                     <FavoriteBorderIcon
-                      onClick={() => handleUpdate(offer.id, "favorite", !offer.isFavorite)}
+                      onClick={() => updateOffer(offer.id, "favorite", !offer.isFavorite)}
                       className={classes.iconButton}
                     />
                   )}
                 </TableCell>
                 <TableCell align="center">{offer.active ? "oui" : "non"}</TableCell>
                 <TableCell align="center">{offer.price + " €"}</TableCell>
-                <TableCell align="center">{offer.surface}</TableCell>
+                <TableCell align="center">{offer.surface + " m²"}</TableCell>
                 <TableCell align="center">{offer.rooms}</TableCell>
                 <TableCell align="center">{offer.city}</TableCell>
                 <TableCell align="center">
@@ -119,7 +101,7 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
                     <Icon
                       className={classes.iconButton}
                       style={{ color: "#26d300" }}
-                      onClick={() => handleUpdate(offer.id, "contacted", !offer.isContacted)}
+                      onClick={() => updateOffer(offer.id, "contacted", !offer.isContacted)}
                     >
                       check
                     </Icon>
@@ -127,7 +109,7 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
                     <Icon
                       className={classes.iconButton}
                       style={{ color: "red" }}
-                      onClick={() => handleUpdate(offer.id, "contacted", !offer.isContacted)}
+                      onClick={() => updateOffer(offer.id, "contacted", !offer.isContacted)}
                     >
                       close
                     </Icon>
@@ -137,7 +119,7 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
                   <Icon
                     className={classes.iconButton}
                     style={{ color: "gray" }}
-                    onClick={() => handleUpdate(offer.id, "delete", true)}
+                    onClick={() => updateOffer(offer.id, "delete", true)}
                   >
                     delete
                   </Icon>
@@ -150,4 +132,4 @@ const Offers: FC<Props> = ({ offers = [], reduce = false }): ReactElement => {
   );
 };
 
-export default Offers;
+export default OfferList;

@@ -1,7 +1,6 @@
 import API from "./API";
-
 class OfferAPI extends API {
-  endpoint: string;
+  private endpoint: string;
 
   constructor(baseURL: string) {
     super(baseURL);

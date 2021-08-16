@@ -12,8 +12,9 @@ import {
   Icon,
 } from "@material-ui/core/";
 import ScrapDialog from "./ScrapDialog";
-import { Scrap } from "../model/Scrap.model";
+import { Scraper } from "../model/Scrap.model";
 import { DISPLAY_FEW_ITEMS } from "../utils/constants";
+import useScrapers from "../hooks/useScrapers";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -31,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface Props {
-  scrapings: Array<Scrap | any>;
+  scrapings: Array<Scraper | any>;
   reduce?: boolean;
 }
 
@@ -39,29 +40,6 @@ const getTimestamp = (date: string): number => new Date(date).getTime();
 
 const sortByDate = (a: any, b: any): number => {
   return getTimestamp(a.createdAt) - getTimestamp(b.createdAt);
-};
-
-const getStatus = (status: string) => {
-  const colors: any = {
-    active: "green",
-    warning: "orange",
-    inactive: "red",
-  };
-
-  return <Icon style={{ color: colors[status] }}>circle</Icon>;
-};
-
-const getAction = (status: string, severity: number) => {
-  const isErrored = severity === 3;
-  const isActive = status !== "inactive";
-  const isWarning = status === "warning";
-  const variant = isActive && isWarning ? "contained" : "outlined";
-  const label = isActive ? "Désactiver" : "Activer";
-  return (
-    <Button variant={variant} disabled={isErrored}>
-      {label}
-    </Button>
-  );
 };
 
 const getFrequency = (interval: number) => {
@@ -76,48 +54,64 @@ const getFrequency = (interval: number) => {
 
 const Scrapings: FC<Props> = ({ scrapings = [], reduce }): ReactElement => {
   const classes = useStyles();
+  const { toogleScraper } = useScrapers();
+
+  const getAction = (active: boolean, scraperId: number, value: boolean) => {
+    const variant = active ? "outlined" : "contained";
+    const label = active ? "Désactiver" : "Activer";
+    const color = !active ? "primary" : "inherit";
+    return (
+      <Button
+        fullWidth
+        color={color}
+        variant={variant}
+        disabled={false}
+        onClick={() => toogleScraper(scraperId, value)}
+      >
+        {label}
+      </Button>
+    );
+  };
+
+  const titles = [
+    "Scrapings enregistrés",
+    "Status",
+    "Action",
+    "Fournisseur",
+    "Fréquence",
+    "Erreur",
+    "Modifier",
+    "Supprimer",
+  ];
+
+  console.log("[scrapings] ", scrapings);
 
   return (
     <TableContainer component={Paper} className={classes.root}>
       <Table className={classes.table} aria-label="Data Grid">
         <TableHead style={{ fontWeight: "bold", color: "red" }}>
           <TableRow hover>
-            <TableCell className={classes.header}>Scrapings enregistrés</TableCell>
-            <TableCell className={classes.header} align="center">
-              Status
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Action
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Fournisseur
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Fréquence
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Erreur
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Modifier
-            </TableCell>
-            <TableCell className={classes.header} align="center">
-              Supprimer
-            </TableCell>
+            {titles.map((title: string, index: number) => (
+              <TableCell className={classes.header} align={index === 0 ? "left" : "center"}>
+                {title}
+              </TableCell>
+            ))}
           </TableRow>
         </TableHead>
         <TableBody>
           {scrapings
-            .sort(sortByDate)
+            .sort((a, b) => b.id - a.id)
             .filter((_, index) => (reduce ? index <= DISPLAY_FEW_ITEMS : true))
-            .map((scrap: Scrap, index: number) => (
+            .map((scrap: Scraper, index: number) => (
               <TableRow key={scrap.title + index}>
                 <TableCell component="th" scope="row" style={{ fontWeight: "bold" }}>
                   {scrap.title}
                 </TableCell>
-                <TableCell align="center">{getStatus(scrap.status)}</TableCell>
-                <TableCell align="center">{getAction(scrap.status, scrap.severity || 0)}</TableCell>
-                <TableCell align="center">{scrap.provider && scrap.provider.name}</TableCell>
+                <TableCell align="center">
+                  {<Icon style={{ color: scrap.active ? "green" : "red" }}>circle</Icon>}
+                </TableCell>
+                <TableCell align="center">{getAction(scrap.active, scrap.id, !scrap.active)}</TableCell>
+                <TableCell align="center">{scrap.providerId}</TableCell>
                 <TableCell align="center">{getFrequency(scrap.pollInterval)}</TableCell>
                 <TableCell align="center">{scrap.lastError ? scrap.lastError : "Aucune"}</TableCell>
                 <TableCell align="center">

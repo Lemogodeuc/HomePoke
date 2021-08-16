@@ -106,9 +106,10 @@ const OfferDialog = ({ type, image, title, description, details }: any) => {
             </Button>
           </DialogActions>
           <Details items={details} />
-          {details.imageUrls.map((image: string) => (
-            <CardMedia className={classes.image} image={image} title={title} />
-          ))}
+          {Array.isArray(details.imageUrls) &&
+            details.imageUrls.map((image: string) => (
+              <CardMedia className={classes.image} image={image} title={title} />
+            ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="default">

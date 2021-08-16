@@ -1,19 +1,22 @@
-import { FC, ReactElement, useState, useEffect } from "react";
+import { FC, ReactElement, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import Card from "../components/Card";
-import { Offer } from "../model/Offer.model";
-import { Scrap } from "../model/Scrap.model";
-
-// API
-import API from "../data";
-
-// components
 import PageTitle from "../components/PageTitle";
 import Scrapers from "../components/ScrapingUrls";
 
+// context
+import { AppContext } from "../context";
+
+// hook
+import useOffers from "../hooks/useOffers";
+import useScrapers from "../hooks/useScrapers";
+
 // constants
-import { APP_TITLE, PAGE_TITLE_HOME } from "../utils/constants";
+import { APP_TITLE, PAGE_TITLE_HOME, DISPLAY_FEW_ITEMS } from "../utils/constants";
+
+// types
+import { Offer } from "../model/Offer.model";
 
 // define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
@@ -35,32 +38,15 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Home: FC<{}> = (): ReactElement => {
   const classes = useStyles();
-  const [offers, setOffers] = useState<null | Offer[]>(null);
-  const [scrapers, setScrapers] = useState<null | Scrap[]>(null);
-
-  const getAllOffers = async () => {
-    try {
-      const data = await API.offer.getAllByUserId(1);
-      setOffers(data);
-      console.log("[offers] ", data);
-    } catch (error) {
-      console.log("[getAllOffers] ", error);
-    }
-  };
-
-  const getAllScrapers = async () => {
-    try {
-      const data = await API.scraper.getAllByUserId(1);
-      setScrapers(data);
-    } catch (error) {
-      console.log("[getAllScrapers] ", error);
-    }
-  };
+  const { state } = useContext(AppContext);
+  const { getAllOffers } = useOffers();
+  const { getAllScrapers } = useScrapers();
 
   useEffect(() => {
-    !offers && getAllOffers();
-    !scrapers && getAllScrapers();
-  }, [offers, scrapers]);
+    console.log("[state] ", state);
+    !state.offers.length && getAllOffers();
+    !state.scrapers && getAllScrapers();
+  }, [state]);
 
   return (
     <>
@@ -74,8 +60,8 @@ const Home: FC<{}> = (): ReactElement => {
         <PageTitle title={PAGE_TITLE_HOME} />
         <br></br>
         <div className={classes.content}>
-          {offers?.map((offer: Offer, index: number) => index <= 5 && <Card content={offer} />)}
-          <Scrapers scrapings={scrapers || []} reduce />
+          {state.offers.map((offer: Offer, index: number) => index <= DISPLAY_FEW_ITEMS && <Card content={offer} />)}
+          <Scrapers scrapings={state.scrapers} reduce />
         </div>
       </div>
     </>

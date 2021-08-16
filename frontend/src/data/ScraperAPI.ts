@@ -1,7 +1,7 @@
 import API from "./API";
-
+import { ScrapFormValues } from "../model/Scrap.model";
 class ScraperAPI extends API {
-  endpoint: string;
+  private endpoint: string;
 
   constructor(baseURL: string) {
     super(baseURL);
@@ -24,20 +24,30 @@ class ScraperAPI extends API {
     }
   }
 
-  async createOne(userId: number, data: any) {
+  async createOne(data: ScrapFormValues) {
     try {
-      return await this.request("post", `${this.endpoint}/user/${userId}`, data);
+      return await this.request("put", `${this.endpoint}/create`, data);
     } catch (error) {
       console.log("[createOne] ", error);
     }
   }
-  async updateOne(data: any) {
+
+  async updateOne(data: ScrapFormValues) {
     try {
-      return await this.request("put", this.endpoint, data);
+      return await this.request("put", `${this.endpoint}/update`, data);
     } catch (error) {
       console.log("[updateOne] ", error);
     }
   }
+
+  async toggleOne(id: number, value: boolean) {
+    try {
+      return await this.request("patch", `${this.endpoint}/toogle/${id}?active=${value}`);
+    } catch (error) {
+      console.log("[createOne] ", error);
+    }
+  }
+
   async deleteOne(scrapId: number) {
     try {
       return await this.request("delete", `${this.endpoint}/${scrapId}`);
