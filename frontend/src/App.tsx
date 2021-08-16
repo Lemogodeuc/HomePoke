@@ -2,7 +2,6 @@ import React, { ReactElement, useReducer, FC } from "react";
 import { createMuiTheme, Theme, responsiveFontSizes, ThemeProvider } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Helmet } from "react-helmet";
-
 // components
 import Layout from "./components/Layout";
 
@@ -18,8 +17,8 @@ import { APP_TITLE } from "./utils/constants";
 // interfaces
 import RouteItem from "./model/RouteItem.model";
 
-// define app context
-const AppContext = React.createContext(null);
+// context
+import { AppProvider } from "./context";
 
 // default component
 const DefaultComponent: FC<{}> = (): ReactElement => <div>{`No Component Defined.`}</div>;
@@ -36,7 +35,7 @@ function App() {
       <Helmet>
         <title>{APP_TITLE}</title>
       </Helmet>
-      <AppContext.Provider value={null}>
+      <AppProvider>
         <ThemeProvider theme={theme}>
           <Router>
             <Switch>
@@ -65,7 +64,7 @@ function App() {
             </Switch>
           </Router>
         </ThemeProvider>
-      </AppContext.Provider>
+      </AppProvider>
     </>
   );
 }

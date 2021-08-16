@@ -1,16 +1,21 @@
-import { useState, useEffect, FC, ReactElement } from "react";
+import { useEffect, FC, ReactElement, useContext } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { Paper } from "@material-ui/core/";
 import ScrapinUrls from "../components/ScrapingUrls";
 import ScrapDialog from "../components/ScrapDialog";
-import API from "../data";
+
+// context
+import { AppContext } from "../context";
 
 // components
 import PageTitle from "../components/PageTitle";
 
 // constants
 import { APP_TITLE, PAGE_TITLE_SCRAPER } from "../utils/constants";
+
+// hook
+import useScrapers from "../hooks/useScrapers";
 
 // define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
@@ -30,18 +35,12 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Scraper: FC<{}> = (): ReactElement => {
   const classes = useStyles();
-  const [scrapers, setScrapers] = useState([]);
+  const { getAllScrapers } = useScrapers();
+  const { state } = useContext(AppContext);
 
   useEffect(() => {
-    !scrapers.length &&
-      (async () => {
-        try {
-          setScrapers(await API.scraper.getAllByUserId(1));
-        } catch (error) {
-          console.log("[getScraps] ", error);
-        }
-      })();
-  }, [scrapers]);
+    !state.scrapers.length && getAllScrapers(1);
+  }, [state]);
 
   return (
     <>
@@ -55,7 +54,7 @@ const Scraper: FC<{}> = (): ReactElement => {
         <Paper className={classes.addScrap} square>
           <ScrapDialog mode="create" />
         </Paper>
-        <ScrapinUrls scrapings={scrapers} />
+        <ScrapinUrls scrapings={state.scrapers} />
       </div>
     </>
   );

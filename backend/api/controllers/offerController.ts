@@ -45,7 +45,6 @@ const offerController = {
       const { offerId, action } = req.params;
       const { value } = req.body;
       const result = await req.context.dataSources.offers.updateOneById(offerId, action, value);
-      console.log("[result] ", result);
       res.json(result);
     } catch (error) {
       next(error);

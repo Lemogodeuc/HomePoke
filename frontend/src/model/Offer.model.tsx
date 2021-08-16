@@ -1,3 +1,4 @@
+import { ActionMap } from "../model/Context.model";
 export interface Offer {
   id: number;
   active: boolean;
@@ -26,3 +27,19 @@ export interface Offer {
   userId: number | null;
   assets: string | null;
 }
+
+export enum Types {
+  store = "STORE_OFFERS",
+  favorite = "UPDATE_FAVORITE",
+  contacted = "UPDATE_CONTACTED",
+  delete = "UPDATE_DELETE",
+}
+
+export type OfferPayload = {
+  [Types.store]: Offer[];
+  [Types.favorite]: { id: number; value: boolean };
+  [Types.contacted]: { id: number; value: boolean };
+  [Types.delete]: { id: number; value: boolean };
+};
+
+export type OfferActions = ActionMap<OfferPayload>[keyof ActionMap<OfferPayload>];

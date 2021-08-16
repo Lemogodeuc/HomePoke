@@ -20,7 +20,6 @@ const scraperController = {
 
   async createOne(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { profileId } = req.params;
       const { title, url, provider, frequency } = req.body;
 
       const providerId = provider === "leboncoin.fr" ? 1 : null;
@@ -32,7 +31,7 @@ const scraperController = {
         pollInterval: frequency,
         url: url,
         method: providerId ? "OPTIONS" : "GET",
-        profileId: profileId,
+        userId: 1,
         providerId: providerId,
       };
 
@@ -51,6 +50,22 @@ const scraperController = {
   async updateOne(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const result = await req.context.dataSources.scrapers.updateOne(req.body);
+
+      if (!result) {
+        return next({ httpStatus: 400 });
+      }
+
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async toggleOne(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { scraperId } = req.params;
+      const { active } = req.query;
+      const result = await req.context.dataSources.scrapers.toggleOne(scraperId, active === "true");
 
       if (!result) {
         return next({ httpStatus: 400 });
@@ -83,6 +98,8 @@ const scraperController = {
       if (!scrapers) {
         throw req.context.error.http(404);
       }
+
+      console.log("[scrapers] ", scrapers);
 
       res.json(scrapers);
     } catch (error) {

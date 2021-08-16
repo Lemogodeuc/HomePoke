@@ -6,7 +6,9 @@ import { ScrapFormValues, Scrap } from "../../model/Scrap.model";
 import useStyles from "./styles";
 import initValues from "./initValues";
 import validationSchema from "./validationSchema";
-import API from "../../data";
+
+// hook
+import useScrapers from "../../hooks/useScrapers";
 
 const ScrapForm: FC<{ handleClose: any; values?: Scrap; mode: string }> = ({
   handleClose,
@@ -14,6 +16,7 @@ const ScrapForm: FC<{ handleClose: any; values?: Scrap; mode: string }> = ({
   mode,
 }): ReactElement => {
   const classes = useStyles();
+  const { createScraper, updateScraper } = useScrapers();
   const [active, setActive] = useState({
     status: true,
     helperText: "Fournisseur pas encore disponible",
@@ -24,8 +27,7 @@ const ScrapForm: FC<{ handleClose: any; values?: Scrap; mode: string }> = ({
     validationSchema,
     onSubmit: async (values: ScrapFormValues) => {
       try {
-        mode === "create" ? await API.scraper.createOne(1, values) : await API.scraper.updateOne(values);
-        // TODO: update context with result
+        mode === "create" ? createScraper(values) : updateScraper(values);
         handleClose();
       } catch (error) {
         console.log("[error] ", error);

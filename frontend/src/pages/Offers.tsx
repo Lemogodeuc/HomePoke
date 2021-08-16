@@ -1,17 +1,19 @@
-import { FC, ReactElement, useState, useEffect } from "react";
+import { FC, ReactElement, useState, useEffect, useContext } from "react";
 import { Helmet } from "react-helmet";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import { Offer } from "../model/Offer.model";
+
+// context
+import { AppContext } from "../context";
 
 // components
 import PageTitle from "../components/PageTitle";
-import Offers from "../components/Offers";
-
-// API
-import API from "../data";
+import OfferList from "../components/OfferList";
 
 // constants
 import { APP_TITLE, PAGE_TITLE_OFFERS } from "../utils/constants";
+
+// hook
+import useOffers from "../hooks/useOffers";
 
 // define css-in-js
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,23 +27,15 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-const Dashboard: FC<{}> = (): ReactElement => {
+const Offers: FC<{}> = (): ReactElement => {
   const classes = useStyles();
-  const [offers, setOffers] = useState<null | Offer[]>(null);
-
-  const getAllOffers = async () => {
-    try {
-      const data = await API.offer.getAllByUserId(1);
-      console.log("[data] ", data);
-      setOffers(data);
-    } catch (error) {
-      console.log("[getAllOffers] ", error);
-    }
-  };
+  const { getAllOffers } = useOffers();
+  const { state } = useContext(AppContext);
+  const [called, setCalled] = useState<boolean>(false);
 
   useEffect(() => {
-    !offers && getAllOffers();
-  }, [offers]);
+    !called && getAllOffers(1) && setCalled(!called);
+  }, [called, state, getAllOffers]);
 
   return (
     <>
@@ -53,10 +47,10 @@ const Dashboard: FC<{}> = (): ReactElement => {
       <div className={classes.root}>
         <PageTitle title={PAGE_TITLE_OFFERS} />
         <br></br>
-        <Offers offers={offers ? offers : []} />
+        <OfferList offers={state.offers} />
       </div>
     </>
   );
 };
 
-export default Dashboard;
+export default Offers;
