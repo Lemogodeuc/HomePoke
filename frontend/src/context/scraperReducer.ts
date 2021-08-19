@@ -38,12 +38,13 @@ export const scraperReducer = (state: Scraper[], action: ScraperActions | OfferA
 
       return scraperIndex !== -1 ? store(state) : state;
 
-    // case Types.delete:
-    // scraperIndex = getIndex(action.payload.id, state)
-    //   if (scraperIndex !== -1) {
-    //     state[scraperIndex].isDelete = action.payload.value;
-    //   }
-    //   return scraperIndex !== -1 ? store(state) : state;
+    case Types.delete:
+      scraperIndex = getIndex(action.payload, state);
+      if (scraperIndex !== -1) {
+        delete state[scraperIndex];
+      }
+
+      return scraperIndex !== -1 ? store(state) : state;
 
     default:
       return state;
