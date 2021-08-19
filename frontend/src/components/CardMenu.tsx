@@ -1,21 +1,19 @@
 import { FC, ReactElement, useState, MouseEvent } from "react";
 
-// Mui components
+// components
 import { withStyles } from "@material-ui/core/styles";
 import { Menu, MenuItem, ListItemIcon, ListItemText, IconButton } from "@material-ui/core";
 import { MenuProps } from "@material-ui/core/Menu";
+import { FavoriteButton, ContactedButton, DeleteButton } from "./buttons";
 
 // icons
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import DeleteIcon from "@material-ui/icons/Delete";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-import DoneIcon from "@material-ui/icons/Done";
-import ShareIcon from "@material-ui/icons/Share";
-import ClearIcon from "@material-ui/icons/Clear";
 
-// APÏ
-import API from "../data";
+// hook
+import useOffers from "../hooks/useOffers";
+
+// types
+import { Offer } from "../model/Offer.model";
 
 const StyledMenu = withStyles({
   paper: {
@@ -49,13 +47,12 @@ const StyledMenuItem = withStyles((theme) => ({
 }))(MenuItem);
 
 interface Props {
-  offerId: number;
-  isFavorite: boolean;
-  isContacted: boolean;
+  offer: Offer;
 }
 
-const CardMenu: FC<Props> = ({ offerId, isFavorite, isContacted }): ReactElement => {
+const CardMenu: FC<Props> = ({ offer }): ReactElement => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { updateOffer } = useOffers();
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -65,38 +62,25 @@ const CardMenu: FC<Props> = ({ offerId, isFavorite, isContacted }): ReactElement
     setAnchorEl(null);
   };
 
-  const handleUpdate = async (offerId: number, action: string, value: boolean) => {
-    API.offer.updateOne(offerId, action, value);
-  };
-
   return (
     <div>
       <IconButton aria-label="settings" onClick={handleClick}>
         <MoreVertIcon />
       </IconButton>
       <StyledMenu id="customized-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-        <StyledMenuItem onClick={() => handleUpdate(offerId, "favorite", !isFavorite)}>
+        <StyledMenuItem onClick={() => updateOffer(offer.id, "favorite", !offer.isFavorite)}>
           <ListItemIcon>
-            {isFavorite ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderIcon fontSize="small" />}
+            <FavoriteButton offer={offer} />
           </ListItemIcon>
           <ListItemText primary="Favoris" />
         </StyledMenuItem>
-        <StyledMenuItem onClick={() => handleUpdate(offerId, "contacted", !isContacted)}>
-          <ListItemIcon>{isContacted ? <DoneIcon fontSize="small" /> : <ClearIcon fontSize="small" />}</ListItemIcon>
+        <StyledMenuItem onClick={() => updateOffer(offer.id, "contacted", !offer.isContacted)}>
+          <ListItemIcon>
+            <ContactedButton offer={offer} />
+          </ListItemIcon>
           <ListItemText primary="Contacté" />
         </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <ShareIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Partager" />
-        </StyledMenuItem>
-        <StyledMenuItem onClick={() => handleUpdate(offerId, "delete", true)}>
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText primary="Supprimer" />
-        </StyledMenuItem>
+        <DeleteButton offer={offer} isListItem={true} />
       </StyledMenu>
     </div>
   );

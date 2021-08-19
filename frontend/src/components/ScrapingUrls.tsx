@@ -15,6 +15,7 @@ import ScrapDialog from "./ScrapDialog";
 import { Scraper } from "../model/Scrap.model";
 import { DISPLAY_FEW_ITEMS } from "../utils/constants";
 import useScrapers from "../hooks/useScrapers";
+import { DeleteButton } from "./buttons";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -35,12 +36,6 @@ interface Props {
   scrapings: Array<Scraper | any>;
   reduce?: boolean;
 }
-
-const getTimestamp = (date: string): number => new Date(date).getTime();
-
-const sortByDate = (a: any, b: any): number => {
-  return getTimestamp(a.createdAt) - getTimestamp(b.createdAt);
-};
 
 const getFrequency = (interval: number) => {
   const minutes = interval !== 0 ? interval / 1000 / 60 : null;
@@ -118,7 +113,7 @@ const Scrapings: FC<Props> = ({ scrapings = [], reduce }): ReactElement => {
                   <ScrapDialog mode="edit" values={scrap} />
                 </TableCell>
                 <TableCell align="center">
-                  <ScrapDialog mode="delete" values={scrap} />
+                  <DeleteButton scraper={scrap} />
                 </TableCell>
               </TableRow>
             ))}

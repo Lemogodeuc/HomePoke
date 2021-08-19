@@ -2,21 +2,15 @@ import { ReactElement, FC } from "react";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 
 // components
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Icon } from "@material-ui/core/";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@material-ui/core/";
 import CardDialog from "./OfferDialog";
+import { FavoriteButton, ContactedButton, DeleteButton } from "./buttons";
 
 // constants
 import { DISPLAY_FEW_ITEMS } from "../utils/constants";
 
-// icons
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
-
 // types
 import { Offer } from "../model/Offer.model";
-
-// hook
-import useOffers from "../hooks/useOffers";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -48,7 +42,6 @@ const sortByDate = (a: any, b: any): number => {
 };
 
 const OfferList: FC<Props> = ({ offers, reduce = false }): ReactElement => {
-  const { updateOffer } = useOffers();
   const classes = useStyles();
   const titles = ["Voir", "Favoris", "Actif", "Loyer", "Superficie", "Pièces", "Ville", "Contacté", "Supprimer"];
 
@@ -78,18 +71,7 @@ const OfferList: FC<Props> = ({ offers, reduce = false }): ReactElement => {
                   <CardDialog type="Offer" title={offer.title} description={offer.description} details={offer} />
                 </TableCell>
                 <TableCell align="center">
-                  {offer.isFavorite ? (
-                    <FavoriteIcon
-                      className={classes.iconButton}
-                      onClick={() => updateOffer(offer.id, "favorite", !offer.isFavorite)}
-                      style={{ color: "red" }}
-                    />
-                  ) : (
-                    <FavoriteBorderIcon
-                      onClick={() => updateOffer(offer.id, "favorite", !offer.isFavorite)}
-                      className={classes.iconButton}
-                    />
-                  )}
+                  <FavoriteButton offer={offer} />
                 </TableCell>
                 <TableCell align="center">{offer.active ? "oui" : "non"}</TableCell>
                 <TableCell align="center">{offer.price + " €"}</TableCell>
@@ -97,32 +79,10 @@ const OfferList: FC<Props> = ({ offers, reduce = false }): ReactElement => {
                 <TableCell align="center">{offer.rooms}</TableCell>
                 <TableCell align="center">{offer.city}</TableCell>
                 <TableCell align="center">
-                  {offer.isContacted ? (
-                    <Icon
-                      className={classes.iconButton}
-                      style={{ color: "#26d300" }}
-                      onClick={() => updateOffer(offer.id, "contacted", !offer.isContacted)}
-                    >
-                      check
-                    </Icon>
-                  ) : (
-                    <Icon
-                      className={classes.iconButton}
-                      style={{ color: "red" }}
-                      onClick={() => updateOffer(offer.id, "contacted", !offer.isContacted)}
-                    >
-                      close
-                    </Icon>
-                  )}
+                  <ContactedButton offer={offer} />
                 </TableCell>
                 <TableCell align="center">
-                  <Icon
-                    className={classes.iconButton}
-                    style={{ color: "gray" }}
-                    onClick={() => updateOffer(offer.id, "delete", true)}
-                  >
-                    delete
-                  </Icon>
+                  <DeleteButton offer={offer} />
                 </TableCell>
               </TableRow>
             ))}

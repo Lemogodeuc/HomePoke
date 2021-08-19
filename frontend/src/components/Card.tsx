@@ -61,7 +61,7 @@ export default function RecipeReviewCard({ content }: any) {
             </Avatar>
           </Tooltip>
         }
-        action={<CardMenu offerId={rest.id} isFavorite={rest.isDelete} isContacted={rest.isDelete} />}
+        action={<CardMenu offer={content} />}
         title={title}
         subheader={new Date(publicationDate).toLocaleDateString("fr-FR", {
           weekday: "long",
