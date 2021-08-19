@@ -7,8 +7,8 @@ services:
     hostname: redis
     ports:
       - 6379:6379
-    # volumes:
-    #   - ./backend/data/cache:/app/backend/data/cache
+    volumes:
+      - ./backend/data/cache:/app/backend/data/cache
     environment:
       - REDIS_AOF_ENABLED=no
     networks:
@@ -29,7 +29,7 @@ services:
       - database
     ports:
       - "5433:5432"
-      
+
   app:
     image: node:14-alpine
     container_name: app
@@ -58,8 +58,7 @@ services:
     image: node:14-alpine
     container_name: frontend
     volumes:
-      - './frontend:/app'
-      # - '/app/node_modules'
+      - "./frontend:/app"
     ports:
       - 3000:3000
     stdin_open: true
