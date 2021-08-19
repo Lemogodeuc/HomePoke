@@ -10,7 +10,7 @@ export const PAGE_TITLE_OFFERS = "Offres";
 export const PAGE_TITLE_SETTINGS = "Réglages";
 export const PAGE_TITLE_GITHUB = "GitHub";
 // DASHBOARD
-export const DISPLAY_FEW_ITEMS = 4;
+export const DISPLAY_FEW_ITEMS = 8;
 // UI CONSTANTS
 export const FOOTER_HEIGHT = 30;
 export const HEADER_HEIGHT = 60;
