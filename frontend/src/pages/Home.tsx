@@ -43,10 +43,9 @@ const Home: FC<{}> = (): ReactElement => {
   const { getAllScrapers } = useScrapers();
 
   useEffect(() => {
-    console.log("[state] ", state);
     !state.offers.length && getAllOffers();
     !state.scrapers && getAllScrapers();
-  }, [state]);
+  }, [state, getAllOffers, getAllScrapers]);
 
   return (
     <>
@@ -60,7 +59,9 @@ const Home: FC<{}> = (): ReactElement => {
         <PageTitle title={PAGE_TITLE_HOME} />
         <br></br>
         <div className={classes.content}>
-          {state.offers.map((offer: Offer, index: number) => index <= DISPLAY_FEW_ITEMS && <Card content={offer} />)}
+          {state.offers.map(
+            (offer: Offer, index: number) => index <= DISPLAY_FEW_ITEMS && !offer.isDelete && <Card content={offer} />
+          )}
           <Scrapers scrapings={state.scrapers} reduce />
         </div>
       </div>

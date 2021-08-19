@@ -40,7 +40,7 @@ const Scraper: FC<{}> = (): ReactElement => {
 
   useEffect(() => {
     !state.scrapers.length && getAllScrapers(1);
-  }, [state]);
+  }, [state, getAllScrapers]);
 
   return (
     <>

@@ -38,7 +38,7 @@ const Dashboard: FC<{}> = (): ReactElement => {
   useEffect(() => {
     !state.offers.length && getAllOffers(1);
     !state.scrapers.length && getAllScrapers(1);
-  }, [state]);
+  }, [state, getAllOffers, getAllScrapers]);
 
   return (
     <>
