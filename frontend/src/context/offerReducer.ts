@@ -18,7 +18,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
       return storeOffers(action.payload);
 
     case Types.favorite:
-      offerIndex = getIndex(<number>action.payload.id, state);
+      offerIndex = getIndex(action.payload.id, state);
       if (offerIndex !== -1) {
         state[offerIndex].isFavorite = action.payload.value;
       }
@@ -26,7 +26,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
       return offerIndex !== -1 ? storeOffers(state) : state;
 
     case Types.contacted:
-      offerIndex = getIndex(<number>action.payload.id, state);
+      offerIndex = getIndex(action.payload.id, state);
       if (offerIndex !== -1) {
         state[offerIndex].isContacted = action.payload.value;
       }
@@ -34,7 +34,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
       return offerIndex !== -1 ? storeOffers(state) : state;
 
     case Types.delete:
-      offerIndex = getIndex(<number>action.payload.id, state);
+      offerIndex = getIndex(action.payload.id, state);
       if (offerIndex !== -1) {
         state[offerIndex].isDelete = action.payload.value;
       }
