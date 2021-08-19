@@ -82,17 +82,16 @@ class ScraperDataSource extends DataSource {
     }
   }
 
-  async deleteOne(id: string | number) {
+  async deleteOne(id: number) {
     try {
       const query = {
-        text: `DELETE FROM "request"
-                     WHERE "id" = $1
-                 RETURNING true`,
-        values: [id],
+        text: 'DELETE FROM "request" WHERE "id" = $1',
+        values: [+id],
       };
 
-      const { rows } = await this.client.query(query);
-      return !!rows[0].bool;
+      const { rowCount } = await this.client.query(query);
+
+      return rowCount === 1;
     } catch (error) {
       this.logger.verbose(error);
     }
