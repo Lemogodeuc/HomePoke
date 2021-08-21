@@ -99,8 +99,6 @@ const scraperController = {
         throw req.context.error.http(404);
       }
 
-      console.log("[scrapers] ", scrapers);
-
       res.json(scrapers);
     } catch (error) {
       next(error);

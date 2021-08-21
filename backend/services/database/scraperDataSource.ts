@@ -109,10 +109,9 @@ class ScraperDataSource extends DataSource {
   async getAllByUserId(userId: number) {
     try {
       const { rows } = await this.client.query('SELECT * FROM "request_view" WHERE "userId" = $1', [userId]);
-      console.log("[rows] ", rows);
+
       return rows;
     } catch (error) {
-      console.log("Error", error);
       this.logger.error(error);
     }
   }
