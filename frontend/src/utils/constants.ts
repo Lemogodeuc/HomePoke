@@ -4,6 +4,7 @@ export const FOOTER_TEXT = `${new Date().getFullYear()} Built with ♡ by HomePo
 // PAGES TITLE
 export const MENU_TITLE_HOME = "Accueil";
 export const PAGE_TITLE_HOME = "Les derniers appartements";
+export const PAGE_TITLE_LOGIN = "Bienvenue !";
 export const PAGE_TITLE_DASHBOARD = "Tableau de bord";
 export const PAGE_TITLE_SCRAPER = "Scrapers";
 export const PAGE_TITLE_OFFERS = "Offres";
@@ -21,3 +22,6 @@ export const SECOND = 1000;
 export const MINUTE = SECOND * 60;
 export const HOUR = MINUTE * 60;
 export const DAY = HOUR * 24;
+// LOGIN
+export const DEFAULT_PASSWORD = "******";
+

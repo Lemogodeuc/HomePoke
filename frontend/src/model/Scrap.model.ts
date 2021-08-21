@@ -1,4 +1,5 @@
-import { ActionMap } from "../model/Context.model";
+import { ActionMap } from "./Context.model";
+
 export interface Scraper {
   id: number;
   userId: number;

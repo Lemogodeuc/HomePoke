@@ -1,34 +1,28 @@
-import { Scraper, ScraperActions, Types } from "../model/Scrap.model";
-import { OfferActions } from "../model/Offer.model";
+import { Scraper, Types } from "../model/Scrap.model";
+import { ReducerActions } from "../model";
 
-export const scraperReducer = (state: Scraper[], action: ScraperActions | OfferActions) => {
-  const store = (payload: Scraper[]) => {
-    localStorage.setItem("scrapers", JSON.stringify(payload));
-    return payload;
-  };
+import { getIndex, storeState } from "./helpers";
 
-  const getIndex = (scraperId: number, scrapers: Scraper[]): number => {
-    return scrapers.findIndex((scraper: Scraper) => scraper.id === scraperId);
-  };
-
+export const scraperReducer = (state: Scraper[], action: ReducerActions) => {
   let scraperIndex: number;
 
   switch (action.type) {
     case Types.store:
-      return store(action.payload);
+      return storeState("scrapers", action.payload);
 
     case Types.create:
       const scrapers: Scraper[] = [...state];
       scrapers.unshift(action.payload);
-      return store(scrapers);
+
+      return storeState("scrapers", scrapers);
 
     case Types.toggle:
       scraperIndex = getIndex(action.payload, state);
-      console.log("[scraperIndex] ", scraperIndex);
       if (scraperIndex !== -1) {
         state[scraperIndex].active = !state[scraperIndex].active;
       }
-      return scraperIndex !== -1 ? store(state) : state;
+
+      return scraperIndex !== -1 ? storeState("scrapers", state) : state;
 
     case Types.update:
       scraperIndex = getIndex(action.payload.id, state);
@@ -36,7 +30,7 @@ export const scraperReducer = (state: Scraper[], action: ScraperActions | OfferA
         state[scraperIndex] = action.payload;
       }
 
-      return scraperIndex !== -1 ? store(state) : state;
+      return scraperIndex !== -1 ? storeState("scrapers", state) : state;
 
     case Types.delete:
       scraperIndex = getIndex(action.payload, state);
@@ -44,7 +38,7 @@ export const scraperReducer = (state: Scraper[], action: ScraperActions | OfferA
         delete state[scraperIndex];
       }
 
-      return scraperIndex !== -1 ? store(state) : state;
+      return scraperIndex !== -1 ? storeState("scrapers", state) : state;
 
     default:
       return state;

@@ -6,6 +6,7 @@ import MenuIcon from "@material-ui/icons/Menu";
 import Brightness7Icon from "@material-ui/icons/Brightness7";
 import Brightness3Icon from "@material-ui/icons/Brightness3";
 import UserIcon from "@material-ui/icons/AccountCircle";
+import { useLocation } from "react-router-dom";
 
 // constants
 import { APP_TITLE, DRAWER_WIDTH } from "../utils/constants";
@@ -21,8 +22,8 @@ const useStyles = makeStyles((theme: Theme) =>
       }),
     },
     appBarShift: {
-      marginLeft: DRAWER_WIDTH,
-      width: `calc(100% - ${DRAWER_WIDTH}px)`,
+      marginLeft: ({ isLoginPage }: any) => (isLoginPage ? "none" : DRAWER_WIDTH),
+      width: ({ isLoginPage }: any) => (isLoginPage ? "none" : `calc(100% - ${DRAWER_WIDTH}px)`),
       transition: theme.transitions.create(["width", "margin"], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -58,7 +59,10 @@ interface Props {
 }
 
 const Header: FC<Props> = ({ open, handleMenuOpen, toggleTheme, useDefaultTheme }): ReactElement => {
-  const classes = useStyles();
+  const { pathname }: any = useLocation();
+  const isLoginPage = pathname === "/login";
+  const classes = useStyles({ isLoginPage });
+
   return (
     <>
       <CssBaseline />

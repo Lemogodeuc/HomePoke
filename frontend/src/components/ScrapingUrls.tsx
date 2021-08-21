@@ -79,8 +79,6 @@ const Scrapings: FC<Props> = ({ scrapings = [], reduce }): ReactElement => {
     "Supprimer",
   ];
 
-  console.log("[scrapings] ", scrapings);
-
   return (
     <TableContainer component={Paper} className={classes.root}>
       <Table className={classes.table} aria-label="Data Grid">

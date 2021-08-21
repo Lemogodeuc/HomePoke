@@ -1,21 +1,13 @@
-import { Offer, OfferActions, Types } from "../model/Offer.model";
-import { ScraperActions } from "../model/Scrap.model";
+import { Offer, Types } from "../model/Offer.model";
+import { ReducerActions } from "../model";
+import { getIndex, storeState } from "./helpers";
 
-export const offerReducer = (state: Offer[], action: OfferActions | ScraperActions) => {
-  const getIndex = (id: number, offers: Offer[]): number => {
-    return offers.findIndex((offer: Offer) => offer.id === id);
-  };
-
-  const storeOffers = (payload: Offer[]) => {
-    localStorage.setItem("offers", JSON.stringify(payload));
-    return payload;
-  };
-
+export const offerReducer = (state: Offer[], action: ReducerActions) => {
   let offerIndex: number;
 
   switch (action.type) {
     case Types.store:
-      return storeOffers(action.payload);
+      return storeState("offers", action.payload);
 
     case Types.favorite:
       offerIndex = getIndex(action.payload.id, state);
@@ -23,7 +15,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
         state[offerIndex].isFavorite = action.payload.value;
       }
 
-      return offerIndex !== -1 ? storeOffers(state) : state;
+      return offerIndex !== -1 ? storeState("offers", state) : state;
 
     case Types.contacted:
       offerIndex = getIndex(action.payload.id, state);
@@ -31,7 +23,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
         state[offerIndex].isContacted = action.payload.value;
       }
 
-      return offerIndex !== -1 ? storeOffers(state) : state;
+      return offerIndex !== -1 ? storeState("offers", state) : state;
 
     case Types.delete:
       offerIndex = getIndex(action.payload.id, state);
@@ -39,7 +31,7 @@ export const offerReducer = (state: Offer[], action: OfferActions | ScraperActio
         state[offerIndex].isDelete = action.payload.value;
       }
 
-      return offerIndex !== -1 ? storeOffers(state) : state;
+      return offerIndex !== -1 ? storeState("offers", state) : state;
 
     default:
       return state;

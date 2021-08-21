@@ -1,9 +1,21 @@
 import { useContext } from "react";
 import { AppContext } from "../context";
+
+// types
 import { Scraper, ScrapFormValues, Types } from "../model/Scrap.model";
+
+// API
 import API from "../data";
 
-const useScrapers = () => {
+type TScrapers = {
+  getAllScrapers: Function;
+  createScraper: Function;
+  updateScraper: Function;
+  toogleScraper: Function;
+  deleteScraper: Function;
+};
+
+const useScrapers = (): TScrapers => {
   const { dispatch } = useContext(AppContext);
 
   const getAllScrapers = async (userId: number = 1) => {

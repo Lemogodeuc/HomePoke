@@ -8,6 +8,7 @@ import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 
 // components
 import Home from "../pages/Home";
+import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Scraper from "../pages/Scraper";
 import Offers from "../pages/Offers";
@@ -21,9 +22,12 @@ import RouteItem from "../model/RouteItem.model";
 import * as constants from "../utils/constants";
 
 // define app routes
-export const routes: Array<RouteItem> = [
+const routes: Array<RouteItem> = [
   {
     key: "router-home",
+    exact: true,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.MENU_TITLE_HOME,
     tooltip: "Home",
     path: "/",
@@ -33,7 +37,22 @@ export const routes: Array<RouteItem> = [
     appendDivider: true,
   },
   {
+    key: "router-login",
+    exact: true,
+    isRestricted: true,
+    isPrivate: false,
+    title: constants.PAGE_TITLE_LOGIN,
+    tooltip: "Connexion",
+    path: "/login",
+    enabled: true,
+    component: Login,
+    icon: HomeIcon,
+  },
+  {
     key: "router-dashboard",
+    exact: false,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.PAGE_TITLE_DASHBOARD,
     tooltip: "Dashboard",
     path: "/dashboard",
@@ -43,6 +62,9 @@ export const routes: Array<RouteItem> = [
   },
   {
     key: "router-scraper",
+    exact: false,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.PAGE_TITLE_SCRAPER,
     tooltip: "Scraper",
     path: "/scraper",
@@ -52,6 +74,9 @@ export const routes: Array<RouteItem> = [
   },
   {
     key: "router-offers",
+    exact: false,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.PAGE_TITLE_OFFERS,
     tooltip: "Offres",
     path: "/offers",
@@ -62,6 +87,9 @@ export const routes: Array<RouteItem> = [
   },
   {
     key: "router-settings",
+    exact: false,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.PAGE_TITLE_SETTINGS,
     tooltip: "Settings",
     path: "/settings",
@@ -71,6 +99,9 @@ export const routes: Array<RouteItem> = [
   },
   {
     key: "router-github",
+    exact: false,
+    isRestricted: true,
+    isPrivate: true,
     title: constants.PAGE_TITLE_GITHUB,
     tooltip: "GitHub",
     path: "/github",
@@ -79,3 +110,5 @@ export const routes: Array<RouteItem> = [
     icon: GitHubIcon,
   },
 ];
+
+export default routes;

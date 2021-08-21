@@ -1,6 +1,10 @@
 import { useContext } from "react";
 import { AppContext } from "../context";
+
+// types
 import { Offer, Types } from "../model/Offer.model";
+
+// API
 import API from "../data";
 
 type Actions = "favorite" | "contacted" | "delete";

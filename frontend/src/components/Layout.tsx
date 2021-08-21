@@ -2,6 +2,7 @@ import { FC, ReactNode, useReducer } from "react";
 import clsx from "clsx";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { CssBaseline } from "@material-ui/core";
+import { useLocation } from "react-router-dom";
 
 // components
 import Header from "./Header";
@@ -25,8 +26,10 @@ const useStyles = makeStyles((theme: Theme) =>
       minHeight: `calc(100vh - ${FOOTER_HEIGHT}px)`,
       background: theme.palette.background.default,
       marginLeft: theme.spacing(7) + 1,
+      // marginLeft: ({ isLoginPage }: any) => (isLoginPage ? 0 : theme.spacing(7) + 1),
       [theme.breakpoints.up("sm")]: {
         marginLeft: theme.spacing(9) + 1,
+        // marginLeft: ({ isLoginPage }: any) => (isLoginPage ? 0 : theme.spacing(9) + 1),
       },
     },
     toolbar: {
@@ -51,13 +54,16 @@ interface Props {
 
 // functional component
 const Layout: FC<Props> = ({ toggleTheme, useDefaultTheme, children }) => {
-  const classes = useStyles();
   const [open, toggle] = useReducer((open) => !open, true);
+  const { pathname }: any = useLocation();
+  const isLoginPage = pathname === "/login";
+  const classes = useStyles({ isLoginPage });
+
   return (
     <div className={classes.root}>
       <CssBaseline />
       <Header open={open} handleMenuOpen={toggle} toggleTheme={toggleTheme} useDefaultTheme={useDefaultTheme} />
-      <Navigation open={open} handleMenuClose={toggle} />
+      {!isLoginPage && <Navigation open={open} handleMenuClose={toggle} />}
       <main
         className={clsx(classes.content, {
           [classes.contentShift]: open,
