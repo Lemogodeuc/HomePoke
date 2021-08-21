@@ -35,6 +35,7 @@ services:
     container_name: app
     volumes:
       - ./backend:/app
+      - /usr/src/app/node_modules
     ports:
       - 4000:4000
     depends_on:
@@ -49,14 +50,19 @@ services:
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
       - PGPORT=${PGPORT}
+      - SALT_ROUNDS=${SALT_ROUNDS}
+      - JWT_SECRET=${JWT_SECRET}
     networks:
       - cache
       - database
-    command: sh -c 'cd /app && npm i && npm run dev'
+    command: sh -c "cd /app && npm i && npm uninstall bcrypt && npm i bcrypt && npm run dev"
 
   frontend:
     image: node:14-alpine
     container_name: frontend
+    build:
+      args:
+        REACT_APP_JWT_SECRET: ${JWT_SECRET}
     volumes:
       - "./frontend:/app"
     ports:
