@@ -2,7 +2,6 @@ import { Offer } from "../../types";
 import { PoolClient } from "pg";
 import { DataSource } from "./dataSource";
 
-
 class UserDataSource extends DataSource {
   private client!: PoolClient;
   private logger!: any;
@@ -18,11 +17,36 @@ class UserDataSource extends DataSource {
     this.context = context;
   }
 
-  async insertOne(offer: Offer) {
-    
-  }
+  async insertOne(offer: Offer) {}
 
   async getOneById(id: number) {
+    try {
+      const { rows } = await this.client.query('SELECT * FROM "user_view" WHERE "id" = $1', [id]);
+      return rows[0];
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
+
+  async createOne(id: number) {
+    try {
+      const { rows } = await this.client.query('SELECT * FROM "user_view" WHERE "id" = $1', [id]);
+      return rows[0];
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
+
+  async geteOneByEmail(email: string) {
+    try {
+      const { rows } = await this.client.query('SELECT * FROM "user_login_view" WHERE "email" = $1', [email]);
+      return rows[0];
+    } catch (error) {
+      this.logger.error(error);
+    }
+  }
+
+  async updateOne(id: number) {
     try {
       const { rows } = await this.client.query('SELECT * FROM "user_view" WHERE "id" = $1', [id]);
       return rows[0];

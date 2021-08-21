@@ -6,7 +6,6 @@ BEGIN;
 
 CREATE TABLE IF NOT EXISTS "user" (
     "id" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    "username" TEXT UNIQUE NOT NULL,
     "firstname" TEXT NULL,
     "lastname" TEXT NULL,
     "email" TEXT UNIQUE NOT NULL,
@@ -98,9 +97,18 @@ CREATE TYPE "user_type" AS ("id" INT, "username" TEXT, "firstname" TEXT, "lastna
 --------------------------------- VIEWS ---------------------------------
 -------------------------------------------------------------------------
 
+CREATE VIEW "user_login_view" AS
+     SELECT "u"."id",
+            "u"."firstname",
+            "u"."lastname",
+            "u"."email",
+            "u"."password",
+            "u"."created_at" AS "createdAt",
+            "u"."updated_at" AS "updatedAt"
+       FROM "user" "u";
+
 CREATE VIEW "user_view" AS
      SELECT "u"."id",
-            "u"."username",
             "u"."firstname",
             "u"."lastname",
             "u"."email",
@@ -167,9 +175,9 @@ CREATE VIEW "offer_view" AS
 --------------------------------- Seeds ---------------------------------
 -------------------------------------------------------------------------
 
--- Users (plain text password: pokePass)
-INSERT INTO "user"("username","firstname", "lastname", "email", "password") VALUES
-('Pepito', 'Quentin', 'Lemogodeuc', 'q.lemogodeuc@gmail.com', '$2y$10$qqU18ORqDHh6ivWjXv07ee2KiFpcsIFLxITRmvZqPL9n7ScjnBIeu');
+-- Users (plain text password: pokepass)
+INSERT INTO "user"("email", "firstname", "lastname", "password") VALUES
+('q.lemogodeuc@gmail.com', 'Quentin', 'Lemogodeuc', '$2b$10$6mm0/sS3nnbUDAgUjRqr1eYVacJNBLrpv1.MYskNFJH2e60vM2KJ6');
 
 -- Providers
 INSERT INTO "provider"("name", "host") VALUES
