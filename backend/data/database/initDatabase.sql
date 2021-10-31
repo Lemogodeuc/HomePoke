@@ -177,7 +177,7 @@ CREATE VIEW "offer_view" AS
 
 -- Users (plain text password: pokepass)
 INSERT INTO "user"("email", "firstname", "lastname", "password") VALUES
-('q.lemogodeuc@gmail.com', 'Quentin', 'Lemogodeuc', '$2b$10$6mm0/sS3nnbUDAgUjRqr1eYVacJNBLrpv1.MYskNFJH2e60vM2KJ6');
+('q.lemogodeuc@gmail.com', 'Quentin', 'Lemogodeuc', '$2b$10$JkLq/6ecFPFANa9ZAVj1O.WO9RIYXn/qRoPK/TFitHkPSDier1Sa.');
 
 -- Providers
 INSERT INTO "provider"("name", "host") VALUES

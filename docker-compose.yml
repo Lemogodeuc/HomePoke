@@ -13,6 +13,7 @@ services:
       - REDIS_AOF_ENABLED=no
     networks:
       - cache
+    restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD}
 
   db:
@@ -25,6 +26,7 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     env_file: .env
+    restart: unless-stopped
     networks:
       - database
     ports:
@@ -55,14 +57,12 @@ services:
     networks:
       - cache
       - database
+    restart: unless-stopped
     command: sh -c "cd /app && npm i && npm uninstall bcrypt && npm i bcrypt && npm run dev"
 
   frontend:
     image: node:14-alpine
     container_name: frontend
-    build:
-      args:
-        REACT_APP_JWT_SECRET: ${JWT_SECRET}
     volumes:
       - "./frontend:/app"
     ports:
@@ -72,6 +72,8 @@ services:
       - app
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_JWT_SECRET=${REACT_APP_JWT_SECRET}
+    restart: unless-stopped
     command: sh -c 'cd /app && npm i && npm run start'
 
 networks:
